@@ -23,6 +23,7 @@
 *.i*86
 *.x86_64
 *.hex
+*.bin
 
 # Misc
 *.map
@@ -43,3 +44,11 @@
 
 # Libraries
 /lib
+
+# Vim Swap
+*.swp
+
+# Apple
+.DS_Store
+
+
