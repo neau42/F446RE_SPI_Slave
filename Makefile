@@ -36,6 +36,31 @@ BUILD_DIR = build
 ######################################
 # C sources
 C_SOURCES =  \
+Core/Src/do_b.c \
+Core/Src/do_c.c \
+Core/Src/do_d.c \
+Core/Src/do_f.c \
+Core/Src/do_ls.c \
+Core/Src/do_not_specifier.c \
+Core/Src/do_o.c \
+Core/Src/do_p.c \
+Core/Src/do_s.c \
+Core/Src/do_u.c \
+Core/Src/do_x.c \
+Core/Src/read_arg.c \
+Core/Src/flags.c \
+Core/Src/ft_atoi.c \
+Core/Src/ft_bzero.c \
+Core/Src/ft_capitaliz.c \
+Core/Src/ft_isdigit.c \
+Core/Src/ft_isprint.c \
+Core/Src/ft_itoa_base_buffer.c \
+Core/Src/ft_memcpy.c \
+Core/Src/ft_memset.c \
+Core/Src/ft_printf.c \
+Core/Src/ft_strlen.c \
+Core/Src/ft_strncat.c \
+Core/Src/ft_strstr.c \
 Core/Src/main.c \
 Core/Src/stm32f4xx_it.c \
 Core/Src/stm32f4xx_hal_msp.c \
@@ -118,7 +143,7 @@ C_INCLUDES =  \
 -IDrivers/STM32F4xx_HAL_Driver/Inc/Legacy \
 -IDrivers/CMSIS/Device/ST/STM32F4xx/Include \
 -IDrivers/CMSIS/Include \
--IDrivers/CMSIS/Include
+-IDrivers/CMSIS/Include \
 
 
 # compile gcc flags
@@ -140,10 +165,9 @@ CFLAGS += -MMD -MP -MF"$(@:%.o=%.d)"
 #######################################
 # link script
 LDSCRIPT = STM32F446RETx_FLASH.ld
-
-# libraries
-LIBS = -lc -lm -lnosys 
-LIBDIR = 
+# lib 42
+LIBS = -lc -lm -lnosys
+LIBDIR =
 LDFLAGS = $(MCU) -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
 
 # default action: build all
@@ -170,10 +194,13 @@ $(BUILD_DIR)/$(TARGET).elf: $(OBJECTS) Makefile
 	$(CC) $(OBJECTS) $(LDFLAGS) -o $@
 	$(SZ) $@
 
+
 $(BUILD_DIR)/%.hex: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
+	# make -C $(LIBFTSPATH)
 	$(HEX) $< $@
 	
 $(BUILD_DIR)/%.bin: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
+	# make -C $(LIBFTSPATH)
 	$(BIN) $< $@	
 	
 $(BUILD_DIR):
@@ -184,6 +211,8 @@ $(BUILD_DIR):
 #######################################
 clean:
 	-rm -fR $(BUILD_DIR)
+	# make fclean -C $(LIBFTSPATH)
+	
   
 #######################################
 # dependencies

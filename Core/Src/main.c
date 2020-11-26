@@ -20,6 +20,9 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
+#include "libft.h"
+#include "ft_printf.h"
+
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -41,7 +44,6 @@
 
 /* Private variables ---------------------------------------------------------*/
 SPI_HandleTypeDef hspi2;
-
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
@@ -95,13 +97,16 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
-  uint8_t outputBuffer = 0;
+  	uint8_t outputBuffer[4] = {0x61,0x62,0x63,0x64,};
+
+  ft_printf("initDone\n\r");
 
   /* Infinite loop */
   while (1)
   {
-      HAL_SPI_Receive(&hspi2, outputBuffer, 1, 100000);
-      HAL_UART_Transmit(&huart2, &outputBuffer, 1, 0xFFFF);
+
+    HAL_SPI_Receive(&hspi2, outputBuffer, 1, 100000);
+    ft_printf("\n\rreceived: [%d]", outputBuffer[0]);
   }
 }
 
