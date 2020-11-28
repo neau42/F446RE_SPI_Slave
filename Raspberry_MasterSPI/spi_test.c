@@ -2,8 +2,13 @@
  * gcc -Wall -Wextra -Werror -o spi spi_test.c
  *
  * USAGE:
- * ./spi /dev/spidev0.1 100000
- * 
+ * $>./spi /dev/spidev0.1 100000
+ *
+ * $> yes "read" | ./spi /dev/spidev0.1 100000
+ *
+ * $> yes "send
+        42" | ./spi /dev/spidev0.1 100000
+ *
  */
 
 #include <fcntl.h>
@@ -42,15 +47,13 @@ int main(int argc, char *argv[])
                 perror("ioctl");
                 exit(EXIT_FAILURE);
         }
-
-        while (fgets(line, 80, stdin) != NULL) {
+        while (printf("Commande: ")
+                && fgets(line, 80, stdin) != NULL)
+        {
                 line[strlen(line) - 1] = '\0';
-
-                printf("get: {%s}\n\r", line);
-
                 if (strcmp(line, "send") == 0)
                 {
-                        printf("value: ");
+                        printf("\tvalue: ");
                         fgets(line, 80, stdin);
                         if (sscanf(line, "%d", & value) != 1)
                         {
@@ -58,7 +61,7 @@ int main(int argc, char *argv[])
                                 continue;
                         }
                         byte = (unsigned char) (value & 0xFF);
-                        printf("Send: '%d'\n", byte);
+                        // printf("Send: '%d'\n", byte);
                         if (write(fd_spi, & byte, 1) != 1)
                         {
                                 perror("write");
@@ -72,12 +75,10 @@ int main(int argc, char *argv[])
                                 perror("write");
                                 exit(EXIT_FAILURE);
                         }
-                    fprintf(stdout, "receive: %d", byte);
+                    fprintf(stdout, "receive: %d\n\r", byte);
                 }
                 else 
                         printf("wait 'send' or 'read'\n\r");
-
-
                 
         }
         close(fd_spi);
