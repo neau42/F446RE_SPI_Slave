@@ -97,16 +97,18 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
-  	uint8_t outputBuffer[4] = {0x61,0x62,0x63,0x64,};
+  	uint8_t outputBuffer[5] = {0x61,0x62,0x63,0x64,0x65};
 
   ft_printf("initDone\n\r");
 
   /* Infinite loop */
   while (1)
   {
+    // ft_printf("\n\test: [%f][%f][%f][%f]", 1.0, 1.2, 1.5, 1.9);
 
-    HAL_SPI_Receive(&hspi2, outputBuffer, 1, 100000);
-    ft_printf("\n\rreceived: [%d]", outputBuffer[0]);
+
+    HAL_SPI_Receive(&hspi2, outputBuffer, 5, 10000);
+    ft_printf("\n\rreceived: [%d][%d] [%3hhd][%3hhd] [%3d]", outputBuffer[0], outputBuffer[1],outputBuffer[2],outputBuffer[3],outputBuffer[4]);
   }
 }
 
