@@ -16,8 +16,11 @@ SPI2_SCK | pin 23	|	PB13
 
 ##### Raspberry:
 ###### compilation:
-    gcc -o spi_read spi_master_read.c
+    gcc -o spi_write spi_master_write.c
 ###### execution:
     ./spi_write /dev/spidev0.1 100000
 
+    ou 
+    
+    python line.py
 
