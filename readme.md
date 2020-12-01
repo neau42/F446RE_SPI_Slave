@@ -6,6 +6,14 @@ ground | pin 25		| GND
 SPI2_MOSI| pin 19		|	PB15
 SPI2_SCK | pin 23	|	PB13
 
+#### stm32
+![alt text](readme/STM32F446RE SPI.png)
+
+#### raspberry 3
+![alt text](readme/Raspberry 3 spi.png)
+
+
+
 ####  stm:
 ###### compilation: 
     "make" à la racine du dossier
