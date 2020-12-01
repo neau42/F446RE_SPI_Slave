@@ -16,20 +16,18 @@ SPI2_SCK | pin 23	|	PB13
 
 
 ####  stm:
-###### compilation: 
-    "make" à la racine du dossier
-###### televerser sur stm32:
-    copie de build/F446RE_Slave.bin sur le peripherie émulé sur ordi
+###### compiler et televerser: 
+    /stm32F446RE_spi_slave/ $> make && cp build/F446RE_Slave.bin /Volumes/NODE_F446RE/.
 ###### lecture port serie:
-    screen /dev/tty.usbmodem**** 115200
+    ~ $> screen /dev/tty.usbmodem**** 115200
 
 ##### Raspberry:
 ###### compilation:
-    gcc -o spi_write spi_master_write.c
+   /Raspberry_MasterSPI/ $> gcc -o spi_write spi_master_write.c
 ###### execution:
-    ./spi_write /dev/spidev0.1 100000
+    /Raspberry_MasterSPI/ $> ./spi_write /dev/spidev0.1 100000
 
     ou 
     
-    python line.py
+    /Raspberry_MasterSPI/ $> python line.py
 
