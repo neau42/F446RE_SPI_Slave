@@ -6,14 +6,26 @@ import time
 
 import spidev
 
-def motorLeft(speed):
+def motorLeft(delta):
     # device:       /dev/spidev0.1 
     # frequence:    100000
-    spi.writebytes([0, speed])
+    val = int(delta);
+    rest= int((delta - val) * 100)
+    print "int: ", val, " , ", rest
+    spi.writebytes([0,0, val, rest, 0]);# &0xFF, 0, (delta >> 8) &0xFF])
+    time.sleep(1.)
+    
     return
 
-def motorRight(speed):
-    spi.writebytes([1, speed])
+def motorRight(delta):
+    val = int(delta);
+    rest= int((delta - val) * 100)
+    print "int: ", val, " , ", rest
+    spi.writebytes([1,1, val, rest, 1]);# &0xFF, 0, (delta >> 8) &0xFF])
+    # spi.writebytes([1, delta &0xFF, 1, (delta >> 8) &0xFF])
+    # spi.writebytes([1, delta])
+    time.sleep(1.)
+    
     return
 
 
@@ -50,7 +62,7 @@ print "spi fd open"
 spi.max_speed_hz = 100000 #? 
 print "spi speed set"
 
-spi.writebytes([42, 43])
+spi.writebytes([0,1,2,3,4])
 print "spi write"
 
 #spi.open(bus, device)
@@ -115,12 +127,14 @@ try:
                 sys.exit(0)
 
             delta = COEFF * (cx - 320)
-            #print("delta: ", delta)
+            print("delta: ", delta)
             sec = int(time.time())
             cmpt_img = cmpt_img +1
-            motorRight(int(SPEED - delta))
-            motorLeft(int(SPEED + delta))
-            time.sleep(1.)
+            # motorRight(int(SPEED - delta))
+            motorRight(- delta)
+            motorLeft(delta)
+            # motorLeft(int(SPEED + delta))
+            # time.sleep(1.)
 
 except KeyboardInterrupt:
     spi.close()
