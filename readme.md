@@ -7,10 +7,11 @@ SPI2_MOSI| pin 19		|	PB15
 SPI2_SCK | pin 23	|	PB13
 
 #### stm32
-![alt text](readme/STM32F446RE SPI.png)
+![alt text](readme/STM32F446RE_SPI.png)
+
 
 #### raspberry 3
-![alt text](readme/Raspberry 3 spi.png)
+![alt text](readme/Raspberry_3_spi.png)
 
 
 
