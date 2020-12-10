@@ -47,8 +47,8 @@
 
     printf("send: %d\n\r", buff_tx[0]);
 
-    buff.rx_buf = (__u64)(long)buff_rx; //~
-    buff.tx_buf = (__u64)(long)buff_tx; //~
+    buff.rx_buf = (__u64)(long)buff_rx;
+    buff.tx_buf = (__u64)(long)buff_tx;
 
     buff.len = 1;
     buff.delay_usecs = 0;
@@ -60,17 +60,13 @@
  }
 
 
-int ft_send(char *line, int fd_spi)
+int     get_send_three(char *line, int fd_spi)
 {
-    // (void)line;
-    // return (spi_transfer(fd_spi));
-
     int motor;
     float value;
-    // unsigned char byte;
     unsigned char buffer[3] = {0};
+ 
     printf("\tmotor: (0:right||1:left) ");
-
     fgets(line, 80, stdin);
     if (sscanf(line, "%d", & motor) != 1 || motor > 1)
     {
@@ -87,18 +83,45 @@ int ft_send(char *line, int fd_spi)
     }
 
     buffer[1] = (int)value;
-    // buffer[2] = (buffer[1] - value) *100;
     value -= buffer[1];
     buffer[2] = (int)(value * 100);
     printf("buf[0]= %d, buf[1]= %d, buf[2]= %d, value: %f\n\r", buffer[0], buffer[1], buffer[2], value);
-    // byte = (unsigned char) (value & 0xFF);
-    
     if (write(fd_spi, buffer, 3) != 3)
     {
         perror("write");
         exit(EXIT_FAILURE);
     }
     return(0);
+}
+
+
+int  get_send_one(char *line, int fd_spi)
+{
+    int value;
+    unsigned char byte;
+
+    printf("\tvalue: ");
+    fgets(line, 80, stdin);
+    if (sscanf(line, "%d", & value) != 1 || value > 255 || value < 0)
+    {
+        fprintf(stderr, "integer value [0:255] expected\n\r");
+        return (-1);
+    }
+    byte = (unsigned char)value;
+    printf("send: %d\n\r", byte);
+    if (write(fd_spi, &byte, 1) != 1)
+    {
+        perror("write");
+        exit(EXIT_FAILURE);
+    }
+    return (0);
+}
+
+int ft_send(char *line, int fd_spi)
+{
+    // return (spi_transfer(fd_spi));
+    return (get_send_one(line, fd_spi));
+    // return (get_send_three(line, fd_spi));
 }
 
 void ft_read(int fd_spi)
