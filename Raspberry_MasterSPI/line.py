@@ -6,30 +6,31 @@ import time
 
 import spidev
 
+def getresult():
+    print("wait result...")
+
+    # ret = spi.readbytes(1)
+    # while ret[0] != 42:
+    #     print "result error ?! : ", ret
+    #     ret = spi.readbytes(1)
+    #     time.sleep(.2)
+    # print "result ok"
+
 def motorLeft(delta):
-    # device:       /dev/spidev0.1 
-    # frequence:    100000
     val = int(delta);
-    rest= int((delta - val) * 100)
-    print "int: ", val, " , ", rest
+    rest = int((delta - val) * 100)
+    # print("int: ", val, " , ", rest)
     spi.writebytes([0,0, val, rest, 0]);# &0xFF, 0, (delta >> 8) &0xFF])
-    time.sleep(1.)
-    
+    time.sleep(0.01)
     return
 
 def motorRight(delta):
     val = int(delta);
-    rest= int((delta - val) * 100)
-    print "int: ", val, " , ", rest
+    rest = int((delta - val) * 100)
+    # print("int: ", val, " , ", rest)
     spi.writebytes([1,1, val, rest, 1]);# &0xFF, 0, (delta >> 8) &0xFF])
-    # spi.writebytes([1, delta &0xFF, 1, (delta >> 8) &0xFF])
-    # spi.writebytes([1, delta])
-    time.sleep(1.)
-    
+    time.sleep(0.01)
     return
-
-
-#from mrpiZ_lib import *
 
 print_img = False
 
@@ -43,7 +44,7 @@ HEIGHT = 480
 # turn coeff
 COEFF = 0.05
 # base robot speed in straight line
-SPEED = 30
+# SPEED = 30
 
 video_capture = cv2.VideoCapture(0)
 video_capture.set(3, WIDTH)
@@ -55,25 +56,21 @@ img = 0
 cmpt_img = 0
 
 spi = spidev.SpiDev()
-print "spi init done"
+print("spi init done")
 spi.open(0, 1)
-print "spi fd open"
+print("spi fd open")
 
-spi.max_speed_hz = 100000 #? 
-print "spi speed set"
+spi.max_speed_hz = 250000 #? 
+print("spi speed set")
 
 spi.writebytes([0,1,2,3,4])
-print "spi write"
-
-#spi.open(bus, device)
-# Connects to the specified SPI device, opening /dev/spidev<bus>.<device>
-
+print("spi write")
 
 try:
     while(True):
 
         if sec != old_sec:
-            print cmpt_img , "img/s"
+            print(cmpt_img , "img/s")
             old_sec = sec
             cmpt_img = 0
         #print("LOOP : ", datetime.now().time())
@@ -127,14 +124,10 @@ try:
                 sys.exit(0)
 
             delta = COEFF * (cx - 320)
-            print("delta: ", delta)
             sec = int(time.time())
             cmpt_img = cmpt_img +1
-            # motorRight(int(SPEED - delta))
-            motorRight(- delta)
+            motorRight(-delta)
             motorLeft(delta)
-            # motorLeft(int(SPEED + delta))
-            # time.sleep(1.)
 
 except KeyboardInterrupt:
     spi.close()
