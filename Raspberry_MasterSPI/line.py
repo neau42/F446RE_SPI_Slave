@@ -7,7 +7,7 @@ import spidev
 
 
 ## DEFINE
-DELAY = 0.007
+DELAY = 0.008
 # DELAY = 0.01
 WIDTH = 640
 HEIGHT = 480
