@@ -164,7 +164,7 @@ dbg = False
 
 def wait_slave(spi):
     ret = [0,0,0,0]
-    print("wait salve ok")
+    print("wait slave ok")
     try:
         while (ret != [1,2,3,4]):
             time.sleep(DELAY)
