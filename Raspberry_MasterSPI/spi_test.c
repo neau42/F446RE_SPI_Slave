@@ -19,6 +19,8 @@
 # include <linux/types.h>
 # include <linux/spi/spidev.h>
 # include <sys/ioctl.h>
+// #include <cv.h>
+
 
 # define SPI_BITS_PER_WORD 8
 # define BUFF_SIZE 32
@@ -94,6 +96,33 @@ int     get_send_three(char *line, int fd_spi)
     return(0);
 }
 
+int  get_send_five(char *line, int fd_spi)
+{
+    int8_t value[5] = {0};
+    // unsigned char byte;
+
+    while (1)
+    {
+        printf("\tfive values: ");
+        fgets(line, 80, stdin);
+        if (sscanf(line, "%hhd %hhd %hhd %hhd %hhd", &value[0], &value[1], &value[2], &value[3], &value[4]) != 5)// || value > 255 || value < 0)
+        {
+            fprintf(stderr, "integer value [0:255] expected\n\r");
+            continue;
+        }
+        // byte = (unsigned char)value;
+        // printf("send: %d\n\r", byte);
+        // if (write(fd_spi, &byte, 1) != 1)
+        if (write(fd_spi, &value, 5) != 5)
+        {
+            perror("write");
+            exit(EXIT_FAILURE);
+        }
+        break;
+    }
+   return (0);
+}
+
 
 int  get_send_one(char *line, int fd_spi)
 {
@@ -119,21 +148,44 @@ int  get_send_one(char *line, int fd_spi)
 
 int ft_send(char *line, int fd_spi)
 {
+    u_int8_t cmd_w[5] = {40, 41, 42, 43, 44};
+
+    if (write(fd_spi, &cmd_w, 5) != 5)
+    {
+        perror("write");
+        exit(EXIT_FAILURE);
+    }
+
+
     // return (spi_transfer(fd_spi));
-    return (get_send_one(line, fd_spi));
+    return (get_send_five(line, fd_spi));
+    // return (get_send_one(line, fd_spi));
     // return (get_send_three(line, fd_spi));
 }
 
 void ft_read(int fd_spi)
 {
-    unsigned char byte;
+    u_int8_t cmd_r[5] = {44, 43, 42, 41, 40};
+    
+    if (write(fd_spi, &cmd_r, 5) != 5)
+    {
+        perror("write");
+        exit(EXIT_FAILURE);
+    }
 
-    if ((read(fd_spi, & byte, 1)) <= 0)
+    u_int8_t byte[5] = {0};
+
+    if (usleep(10000))
+    {
+        perror("usleep");
+        exit(EXIT_FAILURE);
+    }
+    if ((read(fd_spi, & byte, 5)) <= 0)
     {
             perror("read");
             exit(EXIT_FAILURE);
     }
-    fprintf(stdout, "receive: %d\n\r", byte);
+    fprintf(stdout, "receive: %hhd %hhd %hhd %hhd %hhd\n\r", byte[0], byte[1], byte[2], byte[3], byte[4]);
 }
 
 int spi_open(char *file_name)
