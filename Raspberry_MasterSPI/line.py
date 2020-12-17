@@ -20,33 +20,8 @@ LOWER_CROP = 480
 CMD_R_SLAVE = [40,41,42,43]
 CMD_W_SLAVE = [43,42,41,40]
 
-LEFT = 0
-RIGHT = 1
-
-def getresult(spi):
-    time.sleep(DELAY)
-    spi.writebytes(CMD_W_SLAVE);
-    time.sleep(DELAY)
-    ret = spi.readbytes(4)
-    if ret != [1,2,3,4]:
-        print("READ: ", ret)
-
-def motorLeft(spi, delta):
-    # print("LEFT: " , delta);
-    # ret = spi.xfer2([0,0, val, 0])
-    spi.writebytes([0,0, int(delta), 0])
-
-    # print("\t RET: <", ret, ">")
-    getresult(spi)
-    return
-
-def motorRight(spi, delta):
-    # print("RIGHT: " , delta);
-    # ret = spi.xfer2([1,1, val, 1])
-    spi.writebytes([1, 1, int(delta), 1])
-    # print("\t RET: <", ret, ">")
-    getresult(spi)
-    return
+# LEFT = 0
+# RIGHT = 1
 
 def init_spi():
     spi = spidev.SpiDev()
@@ -62,6 +37,41 @@ def init_video_capture():
     video_capture.set(3, WIDTH)
     video_capture.set(4, HEIGHT)
     return (video_capture)
+
+def getresult(spi):
+
+    time.sleep(DELAY)
+    spi.writebytes(CMD_W_SLAVE);
+    time.sleep(DELAY)
+
+    ret = spi.readbytes(4)
+    while (ret != [1,2,3,4]):
+        time.sleep(DELAY)
+        ret = spi.readbytes(4)
+        print("READ: ", ret)
+        
+def sendMotorsValues(spi, delta_left, delta_right):
+    # print("Send: LEFT:" , delta_left, "RIGHT:" , delta_right)
+    spi.writebytes([0, int(delta_left), int(delta_right), 0])
+    getresult(spi)
+    return
+
+# def motorLeft(spi, int(delta)):
+#     # print("LEFT: " , delta);
+#     # ret = spi.xfer2([0,0, val, 0])
+#     spi.writebytes([0,0, int(delta), 0])
+
+#     # print("\t RET: <", ret, ">")
+#     getresult(spi)
+#     return
+
+# def motorRight(spi, delta):
+#     # print("RIGHT: " , delta);
+#     # ret = spi.xfer2([1,1, val, 1])
+#     spi.writebytes([1, 1, int(delta), 1])
+#     # print("\t RET: <", ret, ">")
+#     getresult(spi)
+#     return
 
 def capture_frame(video_capture):
     # Capture the frames
@@ -108,14 +118,16 @@ def find_line_center(thresh):
     return (0)
 
 def send_value_spi(spi, delta):
+    # print("send: ", CMD_R_SLAVE);
     spi.writebytes(CMD_R_SLAVE);
     time.sleep(DELAY)
-    motorRight(spi, (MAX_SPEED / 2) - int(delta))
+    # motorRight(spi, (MAX_SPEED / 2) - int(delta))
+    sendMotorsValues(spi, (MAX_SPEED / 2) + int(delta), (MAX_SPEED / 2) - int(delta))
     time.sleep(DELAY)
     # print("spi.writebytes(CMD_R_SLAVE)")
-    spi.writebytes(CMD_R_SLAVE);
-    time.sleep(DELAY)
-    motorLeft(spi, (MAX_SPEED / 2) + int(delta))
+    # spi.writebytes(CMD_R_SLAVE);
+    # time.sleep(DELAY)
+    # motorLeft(spi, (MAX_SPEED / 2) + int(delta))
 
 def rotate(spi):
     spi.writebytes(CMD_R_SLAVE);
@@ -156,25 +168,23 @@ def find_line(spi):
                 if (error_counter > 5):
                     rotate(spi)
                 print("No contour detected.. retry (",error_counter,")")
-
     except KeyboardInterrupt:
         spi.close()
         sys.exit(0)
 dbg = False
 
-def wait_slave(spi):
-    ret = [0,0,0,0]
-    print("wait slave ok")
-    try:
-        while (ret != [1,2,3,4]):
-            time.sleep(DELAY)
-            ret = spi.readbytes(4)
-            print("ret: ", ret)
-        print("done");
-    except KeyboardInterrupt:
-        spi.close()
-        sys.exit(0)
-
+# def wait_slave(spi):
+#     ret = [0,0,0,0]
+#     print("wait slave ok")
+#     try:
+#         while (ret != [1,2,3,4]):
+#             time.sleep(DELAY)
+#             ret = spi.readbytes(4)
+#             # print("ret: ", ret)
+#         print("done");
+#     except KeyboardInterrupt:
+#         spi.close()
+#         sys.exit(0)
 
 def main():
     global print_img
@@ -184,7 +194,7 @@ def main():
     elif (len(sys.argv) > 1) and (sys.argv[1] == '-d'):
         dbg = True
     spi = init_spi()
-    wait_slave(spi)
+    # wait_slave(spi)
     find_line(spi)
 
 main()
