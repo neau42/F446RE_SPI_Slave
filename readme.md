@@ -8,10 +8,10 @@ SPI_MISO | pin 21 | PB14
 SPI2_MOSI| pin 19 | PB15
 
 #### stm32
-![alt text](readme/STM32F446RE_SPI.png =250x)
+![alt text](readme/STM32F446RE_SPI.png width="250")
 
 #### raspberry 3
-![alt text](readme/Raspberry_3_spi.png =250x)
+![alt text](readme/Raspberry_3_spi.png width="250")
 
 ####  stm:
 ###### compiler et televerser: 
