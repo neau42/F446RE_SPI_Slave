@@ -13,11 +13,16 @@ HEIGHT = 480
 
 MAX_SPEED = 40
 
-UPPER_CROP = 379
+# UPPER_CROP = 379
+# LOWER_CROP = 480
+
+UPPER_CROP = 0
 LOWER_CROP = 480
 
 CMD_R_SLAVE = [40,41,42,43]
 CMD_W_SLAVE = [43,42,41,40]
+
+R_W_CMD = 0
 
 def initSPI():
     spi = spidev.SpiDev()
@@ -35,8 +40,9 @@ def initVideoCapture():
     return (video_capture)
 
 def getResult(spi):
-    spi.writebytes(CMD_W_SLAVE);
-    time.sleep(DELAY)
+    if R_W_CMD == 1:
+        spi.writebytes(CMD_W_SLAVE);
+        time.sleep(DELAY)
     ret = spi.readbytes(4)
     while (ret != [1,2,3,4]):
         time.sleep(DELAY)
@@ -53,21 +59,35 @@ def sendMotorsValues(spi, delta_left, delta_right):
 def captureFrame(video_capture):
     # Capture the frames
     ret, frame = video_capture.read()
-    # if print_img:
-    #     name = "0_init_" + str(sec) +"_" + ".jpg"
-    #     cv2.imwrite(name, frame)
+    if print_img:
+        name = "img/0_init_" + str(sec) +"_" + ".jpg"
+        cv2.imwrite(name, frame)
     return (frame)
 
 def convertFrame(frame):
     global crop_img
     # Crop the image
     crop_img = frame[UPPER_CROP:LOWER_CROP, 0:WIDTH]
+    if print_img:
+        name = "img/1_crop_" + str(sec) +"_" + ".jpg"
+        cv2.imwrite(name, crop_img)
     # Convert to grayscale
     gray = cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY)
+    if print_img:
+        name = "img/2_grey_" + str(sec) +"_" + ".jpg"
+        cv2.imwrite(name, gray)
     # Gaussian blur # necessaire?
     blur = cv2.GaussianBlur(gray,(5,5),0)
+    if print_img:
+        name = "img/3_blur_" + str(sec) +"_" + ".jpg"
+        cv2.imwrite(name, blur)
+
     # Color thresholding
     ret,thresh = cv2.threshold(blur, 60, 255, cv2.THRESH_BINARY_INV)
+    if print_img:
+        name = "img/4_thresh_" + str(sec) +"_" + ".jpg"
+        cv2.imwrite(name, thresh)
+
     return (thresh)
 
 def findLineCenter(thresh):
@@ -87,22 +107,25 @@ def findLineCenter(thresh):
             cv2.line(crop_img,(cx,0),(cx,720),(255,0,0),1)
             cv2.line(crop_img,(0,cy),(1080,cy),(0,0,255),1)
             cv2.drawContours(crop_img, contours, -1, (0,255,0), 1)
-            name_img = "img" + str(cx) + ".jpg"
+            name_img = "img/5_contour_" + str(cx) + ".jpg"
             print("image:", name_img, "created", "cy:", cy)
             cv2.putText(crop_img, str(cx),(25,80), cv2.FONT_HERSHEY_SIMPLEX, 1, (10, 10, 10), 1, cv2.LINE_AA)
             cv2.imwrite(name_img, crop_img)
+            sys.exit(0)
         return (cx)
     return (0)
 
 def sendValueSPI(spi, delta):
-    spi.writebytes(CMD_R_SLAVE);
-    time.sleep(DELAY)
+    if R_W_CMD == 1:
+        spi.writebytes(CMD_R_SLAVE);
+        time.sleep(DELAY)
     sendMotorsValues(spi, (MAX_SPEED / 2) + int(delta), (MAX_SPEED / 2) - int(delta))
     time.sleep(DELAY)
 
 def rotate(spi):
-    spi.writebytes(CMD_R_SLAVE);
-    time.sleep(DELAY)
+    if R_W_CMD == 1:
+        spi.writebytes(CMD_R_SLAVE);
+        time.sleep(DELAY)
     sendMotorsValues(spi,-(MAX_SPEED / 2), (MAX_SPEED / 2))
     time.sleep(DELAY)
 
