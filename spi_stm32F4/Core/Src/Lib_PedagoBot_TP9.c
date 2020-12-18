@@ -143,7 +143,7 @@ void TIM1_BRK_TIM9_IRQHandler(void)//IT_asservissement(void)
         // Asservissement moteur2 //
         // ********************** //
         if (mesureVitesseMoteur2 != 0)
-            mesV2 = 100000/mesureVitesseMoteur2;                                    // Récupération de la mesure
+            mesV2 = 100000 / mesureVitesseMoteur2;                                    // Récupération de la mesure
         else
             mesV2 = 0;
         if((consigneVitesseMoteurBO2 > -25) && (consigneVitesseMoteurBO2 < 25))      // Saturation basse à 0 pour éviter l'instabilité dans les faibles vitesses
@@ -173,17 +173,18 @@ void TIM3_IRQHandler() //IT_codeurTim3(void){
     static int mauvaiseMesure2 = 0;              // Mémorisation de l'info de mauvaise mesure (débordement du timer)
     if ((TIM3->SR & 1) != 0)                     // Déclenchement de l'IT à cause de "Update event" (le CPT à débordé -> mauvaise mesure)
     {
-        mauvaiseMesure2 = 1;                      // On mémorise que la prochaine mesure doit être jetée
-        mesureVitesseMoteur2 = 0;               // Au dela d'une période de 10ms, on considère que la vitesse est nulle
+        mauvaiseMesure2 = 1;                     // On mémorise que la prochaine mesure doit être jetée
+        mesureVitesseMoteur2 = 0;                // Au dela d'une période de 10ms, on considère que la vitesse est nulle
         TIM3->SR &= ~1;                          // Mise à zéro du drapeau d'interruption (Validation de l'IT)
     }
-    else if ((TIM3->SR & (1 << 1)) != 0){        // Déclenchement de l'IT à cause de "Input capture" un front est apparu sur le codeur, une nouvelle valeur de période est dispo
+    else if ((TIM3->SR & (1 << 1)) != 0)         // Déclenchement de l'IT à cause de "Input capture" un front est apparu sur le codeur, une nouvelle valeur de période est dispo
+    {
         //if(((GPIOA->IDR&(1 << 7))>>7)!=((GPIOA->IDR&(1<<6)))>>6 ){ // test du sens de rotation : si PA6==PA7 ->sens1, sinon sens2
         if(((GPIOB->IDR & (1 << 4)) >> 4) != ((GPIOB->IDR & (1 << 5))) >> 5) // test du sens de rotation : si PB4==PB5 ->sens1, sinon sens2
         {
-            if (mauvaiseMesure2 == 1)           // Si la précédente valeur était mauvaise...   
-                mauvaiseMesure2 = 0;            // On réinitialise la variable
-            else                                // La mesure est bonne
+            if (mauvaiseMesure2 == 1)            // Si la précédente valeur était mauvaise...
+                mauvaiseMesure2 = 0;             // On réinitialise la variable
+            else                                 // La mesure est bonne
             mesureVitesseMoteur2 = TIM3->CNT;
             /*// Mise à jour de l'odométrie, que la mesure soit bonn ou non
             X_a -= dx*sin(THETA_a+alpha1);
@@ -192,8 +193,8 @@ void TIM3_IRQHandler() //IT_codeurTim3(void){
         }
         else
         {
-            if (mauvaiseMesure2 == 1)              // Si la précédente valeur était mauvaise...   
-                mauvaiseMesure2 = 0;               // On réinitialise la variable
+            if (mauvaiseMesure2 == 1)            // Si la précédente valeur était mauvaise...
+                mauvaiseMesure2 = 0;             // On réinitialise la variable
             else // La mesure est bonne
                 mesureVitesseMoteur2 = -TIM3->CNT;
             /*// Mise à jour de l'odométrie, que la mesure soit bonn ou non
@@ -289,20 +290,20 @@ void setMotorSpeedBO(unsigned char motorNum, short speed)
     switch(motorNum)
     {
         case MOTORD :
-            TIM1->CCR3 = absSpeed;          // rapport cyclique du PWM pour le moteur 1 // PWM sur PA10
+            TIM1->CCR3 = absSpeed;                 // rapport cyclique du PWM pour le moteur 1 // PWM sur PA10
             GPIOA->BSRR = (1 << (7 + 16 * !sens)); // Mise à "sens" du signal de direction //DIR sur PA7
             break;
         case MOTORG :
-            TIM1->CCR1 = absSpeed;          // rapport cyclique du PWM pour le moteur 2 // PWM sur PA8
+            TIM1->CCR1 = absSpeed;                 // rapport cyclique du PWM pour le moteur 2 // PWM sur PA8
             GPIOA->BSRR = (1 << (11 + 16 * sens)); // Mise à "sens" du signal de direction //DIR sur PA11
             break;
         case MOTOR3 :
-            TIM1->CCR2 = absSpeed;          // rapport cyclique du PWM pour le moteur 3 // PWM sur PA9
+            TIM1->CCR2 = absSpeed;                  // rapport cyclique du PWM pour le moteur 3 // PWM sur PA9
             GPIOA->BSRR = (1 << (12 + 16 * !sens)); // Mise à "sens" du signal de direction //DIR sur PA12
             break;
 /*        case MOTOR4 : 
-            TIM1->CCR4 = absSpeed;          // rapport cyclique du PWM pour l'éventuel moteur 4
-            GPIOA->BSRR = (1<<(3+16*sens)); // Mise à "sens" du signal de direction
+            TIM1->CCR4 = absSpeed;                  // rapport cyclique du PWM pour l'éventuel moteur 4
+            GPIOA->BSRR = (1<<(3+16*sens));         // Mise à "sens" du signal de direction
             break;
 */
     }
@@ -332,8 +333,8 @@ void start_asserv(void)
 void stop_asserv(void)
 {
     TIM9->CR1 &= ~1;                  // Desactivation du Timer9 (arret des interruptions périodiques pour l'asservissement)
-    setMotorSpeedBO(MOTORD, 0);  // Roue droite
-    setMotorSpeedBO(MOTORG, 0);  // Roue gauche
+    setMotorSpeedBO(MOTORD, 0);       // Roue droite
+    setMotorSpeedBO(MOTORG, 0);       // Roue gauche
 }
 
 
@@ -341,7 +342,7 @@ void stop_asserv(void)
 void init_TIM1_PWMx4(void)
 {
     ///// Horloge /////
-    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN;  //GPIOAEN='1' -> activation de l'horloge sur le port A
+    RCC->AHB1ENR |= RCC_AHB1ENR_GPIOAEN; //GPIOAEN='1' -> activation de l'horloge sur le port A
     RCC->APB2ENR |= RCC_APB2ENR_TIM1EN;  // Activation Horloge sur TIM1 (180MHz)
 
     ///// GPIO /////
@@ -521,17 +522,17 @@ void init_encoders_Periode(void){
     ///// TIM4 /////
     TIM4->PSC = 179;            // Prédivison par 180 donc T_CK_CNT=1us
     TIM4->ARR = 49999;          // Valeur max correspondant à une période de 50ms (au dela de cela on considèrera une vitesse nulle).
-    TIM4->EGR |= 1;              // Mise à 1 bit UG de EGR pour provoqer chargement de PSC
+    TIM4->EGR |= 1;             // Mise à 1 bit UG de EGR pour provoqer chargement de PSC
     
-    TIM4->CR1 = (1 << 7);     // Mode auto-reload preload activé   
+    TIM4->CR1 = (1 << 7);       // Mode auto-reload preload activé
     TIM4->CR2 = 0;
     TIM4->SMCR = 0;
  
-    TIM4->CCMR1 = 0x0031;         // Activation d'un filtrage de 8 échantillon sur l'entrée pour éviter le déclenchement sur parasites + Mode Input Capture sur a voie 1
+    TIM4->CCMR1 = 0x0031;             // Activation d'un filtrage de 8 échantillon sur l'entrée pour éviter le déclenchement sur parasites + Mode Input Capture sur a voie 1
     TIM4->CCMR2 = 0;
     TIM4->CCER = (1 << 1) | (1 << 3); // Déclenchement de la capture sur les deux front, Montant ET descendant de la voie 1
     
-    TIM4->SR &= ~3;               // Abaissement des 2 flags pour démarrer les IT proprement
+    TIM4->SR &= ~3;                   // Abaissement des 2 flags pour démarrer les IT proprement
     TIM4->DIER=(1 << 0) | (1 << 1);   // Activation des IT sur input capture et update event (valeur max atteinte).
     // Remapping de la routine d'interruption
     //NVIC_SetVector(TIM4_IRQn,(uint32_t)IT_codeurTim4);
@@ -545,32 +546,32 @@ void init_encoders_Periode(void){
 // Timer 9 pour la période d'échantillonage de l'asservissement
 void init_Timer9_IT_Xus(unsigned int x)
 {
-    RCC->APB2ENR |= (1 << 16);           // Activation de l'horloge sur le Timer9
+    RCC->APB2ENR |= (1 << 16);       // Activation de l'horloge sur le Timer9
     TIM9->PSC = 179;                 // Prescaler de 180, donc T_CK_CNT=180/180M = 1 us
-    TIM9->ARR = x-1;                // Comptage de 0 à x, donc un cycle de comptage en x us    
+    TIM9->ARR = x-1;                 // Comptage de 0 à x, donc un cycle de comptage en x us
     TIM9->EGR |= 1;                  // Mise à 1 bit UG de EGR pour provoq chargt de PSC
     
-    TIM9->SR &= ~1;                   //Mise à zéro du drapeau d'interruption pour démarrer dans de bones conditions
-    TIM9->DIER |= 1;                  // Activation de l'interruption sur l'evt de mise à jour (overflow)
+    TIM9->SR &= ~1;                  //Mise à zéro du drapeau d'interruption pour démarrer dans de bones conditions
+    TIM9->DIER |= 1;                 // Activation de l'interruption sur l'evt de mise à jour (overflow)
     // Remapping de la routine d'interruption
     //NVIC_SetVector(TIM1_BRK_TIM9_IRQn,(uint32_t)IT_asservissement); 
     //Enable TIM1_update IRQ ->équivalent à la ligne suivante
     NVIC_SetPriority(TIM1_BRK_TIM9_IRQn, 3);
     NVIC_EnableIRQ(TIM1_BRK_TIM9_IRQn);
-   // NVIC->ISER[0]=1 << 25;      // Activation de l'IT du timer9 (position 25 dans le tableau des IT)
-    //TIM9->CR1 |=1;                  // Activation du Timer1 (demmarage du comptage)
+   // NVIC->ISER[0]=1 << 25;         // Activation de l'IT du timer9 (position 25 dans le tableau des IT)
+    //TIM9->CR1 |=1;                 // Activation du Timer1 (demmarage du comptage)
         
 }
 // Timer 10 pour la charge du processeur
 void init_Timer10_IT_100us(void)
 {
-    RCC->APB2ENR |= (1 << 17);           // Activation de l'horloge sur le Timer10
-    TIM10->PSC = 179;                 // Prescaler de 180, donc T_CK_CNT=180/180M = 1 us
-    TIM10->ARR = 99;                // Comptage de 0 à x, donc un cycle de comptage en x us    
-    TIM10->EGR |= 1;                  // Mise à 1 bit UG de EGR pour provoq chargt de PSC
+    RCC->APB2ENR |= (1 << 17);       // Activation de l'horloge sur le Timer10
+    TIM10->PSC = 179;                // Prescaler de 180, donc T_CK_CNT=180/180M = 1 us
+    TIM10->ARR = 99;                 // Comptage de 0 à x, donc un cycle de comptage en x us
+    TIM10->EGR |= 1;                 // Mise à 1 bit UG de EGR pour provoq chargt de PSC
     
-    TIM10->SR &= ~1;                   //Mise à zéro du drapeau d'interruption pour démarrer dans de bones conditions
-    TIM10->DIER |= 1;                  // Activation de l'interruption sur l'evt de mise à jour (overflow)
+    TIM10->SR &= ~1;                 //Mise à zéro du drapeau d'interruption pour démarrer dans de bones conditions
+    TIM10->DIER |= 1;                // Activation de l'interruption sur l'evt de mise à jour (overflow)
     // Remapping de la routine d'interruption
 	
     //NVIC_SetVector(TIM1_BRK_TIM9_IRQn,(uint32_t)IT_asservissement); 
@@ -579,8 +580,8 @@ void init_Timer10_IT_100us(void)
 
     NVIC_EnableIRQ(TIM1_UP_TIM10_IRQn);
     
-   // NVIC->ISER[0]=1 << 25;      // Activation de l'IT du timer9 (position 25 dans le tableau des IT)
-    //TIM10->CR1 |=1;                  // Activation du Timer10 (demmarage du comptage)
+   // NVIC->ISER[0]=1 << 25;        // Activation de l'IT du timer9 (position 25 dans le tableau des IT)
+    //TIM10->CR1 |=1;               // Activation du Timer10 (demmarage du comptage)
 }
 
 void init_TIM6_base_500us(void)
@@ -615,7 +616,6 @@ void init_PedagoBot_TP9(void)
         MX_USART2_UART_Init();
     start_asserv();
     //printf("Initialisation finie !!!!!\n\r");
-		
 }
 
 //void SysTick_Handler(void)
@@ -678,12 +678,12 @@ void stopRobot(void)
 {
 	setMotorSpeedBF(MOTORD,0);
 	setMotorSpeedBF(MOTORG,0);
-}	
+}
 
 void load_Processor(void)
 {
-	TIM10->CR1 |=1;                  // Activation du Timer10 (demmarage du comptage)
-}	
+	TIM10->CR1 |= 1;                  // Activation du Timer10 (demmarage du comptage)
+}
 
 // Routine d'interruption périodique (100us) pour charger le processeur
 void TIM1_UP_TIM10_IRQHandler(void)
@@ -758,6 +758,7 @@ void quarterTurnLeft(void)
     stopRobot();
     tempo_TIM6_x_500us(1000);
 }
+
 void quarterTurnRight(void)
 {
     rotateRight();
@@ -789,8 +790,8 @@ unsigned short getLineSensorsValues(unsigned char Coul_Ligne)
         mskk = 0xFFFF;
     else
        mskk = 0;
-    res |= ((GPIOB->IDR ^ mskk) & (1 << 2)) << 6;		// valeur capteur Gauche décalé au bit8
-	res |= ((GPIOB->IDR ^ mskk) & (1 << 1)) << 3;		// valeur capteur Milieu décalé au bit4
+    res |= ((GPIOB->IDR ^ mskk) & (1 << 2)) << 6;   // valeur capteur Gauche décalé au bit8
+	res |= ((GPIOB->IDR ^ mskk) & (1 << 1)) << 3;	// valeur capteur Milieu décalé au bit4
 	res |= ((GPIOB->IDR ^ mskk) & (1 << 15)) >> 15; // valeur capteur Droite décalé au bit0
 	return res;
 }

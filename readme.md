@@ -4,7 +4,7 @@ SPI | Carte Master | Carte Slave |
 | --- | --- | --- |
 ground | pin 25 | GND
 SPI2_SCK | pin 23	|	PB13
-SPI_MISO | pin 21 | PB14
+SPI2_MISO | pin 21 | PB14
 SPI2_MOSI| pin 19 | PB15
 
 #### stm32
