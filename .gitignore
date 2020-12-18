@@ -1,23 +1,23 @@
 img/
 
 
-	spi_stm32F4/.mxproject
-	spi_stm32F4/.osx.project
-	spi_stm32F4/Debug/Core/
-	spi_stm32F4/Debug/Drivers/
-	spi_stm32F4/Debug/objects.list
-	spi_stm32F4/Debug/objects.mk
-	spi_stm32F4/Debug/sources.mk
-	spi_stm32F4/Debug/spi_stm32F4.list
-	spi_stm32F4/Drivers/
-	spi_stm32F4/Release/Core/
-	spi_stm32F4/Release/Drivers/
-	spi_stm32F4/Release/objects.list
-	spi_stm32F4/Release/objects.mk
-	spi_stm32F4/Release/sources.mk
-	spi_stm32F4/Release/spi_stm32F4.list
-	spi_stm32F4/STM32F446RETX_FLASH.ld
-	spi_stm32F4/STM32F446RETX_RAM.ld
+spi_stm32F4/.mxproject
+spi_stm32F4/.osx.project
+spi_stm32F4/Debug/Core/
+spi_stm32F4/Debug/Drivers/
+spi_stm32F4/Debug/objects.list
+spi_stm32F4/Debug/objects.mk
+spi_stm32F4/Debug/sources.mk
+spi_stm32F4/Debug/spi_stm32F4.list
+spi_stm32F4/Drivers/
+spi_stm32F4/Release/Core/
+spi_stm32F4/Release/Drivers/
+spi_stm32F4/Release/objects.list
+spi_stm32F4/Release/objects.mk
+spi_stm32F4/Release/sources.mk
+spi_stm32F4/Release/spi_stm32F4.list
+spi_stm32F4/STM32F446RETX_FLASH.ld
+spi_stm32F4/STM32F446RETX_RAM.ld
 
 
 # Object files
