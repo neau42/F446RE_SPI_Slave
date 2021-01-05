@@ -1,3 +1,5 @@
+#! /usr/bin/python3
+
 import numpy as np
 import cv2
 import sys
@@ -17,7 +19,7 @@ SPI_MAX_SPEED = 250000
 # UPPER_CROP = 379
 # LOWER_CROP = 480
 
-UPPER_CROP = 0
+UPPER_CROP = 240
 LOWER_CROP = 480
 
 CMD_R_SLAVE = [40,41,42,43]
@@ -30,7 +32,7 @@ def initSPI():
     print("spi init done")
     spi.open(0, 1)
     print("spi fd open")
-    spi.max_speed_hz = SPI_MAX_SPEED #? 
+    spi.max_speed_hz = SPI_MAX_SPEED
     print("spi speed set")
     return(spi)
 
@@ -48,7 +50,7 @@ def getResult(spi):
     while (ret != [1,2,3,4]):
         time.sleep(DELAY)
         ret = spi.readbytes(4)
-        print("READ: ", ret)
+        print("read err: ", ret)
         
 def sendMotorsValues(spi, delta_left, delta_right):
     # print("Send: LEFT:" , delta_left, "RIGHT:" , delta_right)
@@ -61,7 +63,7 @@ def captureFrame(video_capture):
     # Capture the frames
     ret, frame = video_capture.read()
     if print_img:
-        name = "img/0_init_" + str(sec) +"_" + ".jpg"
+        name = "img/" + str(sec) + "_0_init.jpg"
         cv2.imwrite(name, frame)
     return (frame)
 
@@ -70,23 +72,23 @@ def convertFrame(frame):
     # Crop the image
     crop_img = frame[UPPER_CROP:LOWER_CROP, 0:WIDTH]
     if print_img:
-        name = "img/1_crop_" + str(sec) +"_" + ".jpg"
+        name = "img/" + str(sec) + "_1_crop.jpg"
         cv2.imwrite(name, crop_img)
     # Convert to grayscale
     gray = cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY)
     if print_img:
-        name = "img/2_grey_" + str(sec) +"_" + ".jpg"
+        name = "img/" + str(sec) + "_2_grey.jpg"
         cv2.imwrite(name, gray)
     # Gaussian blur # necessaire?
     blur = cv2.GaussianBlur(gray,(5,5),0)
     if print_img:
-        name = "img/3_blur_" + str(sec) +"_" + ".jpg"
+        name = "img/" + str(sec) + "_3_blur.jpg"
         cv2.imwrite(name, blur)
 
     # Color thresholding
     ret,thresh = cv2.threshold(blur, 60, 255, cv2.THRESH_BINARY_INV)
     if print_img:
-        name = "img/4_thresh_" + str(sec) +"_" + ".jpg"
+        name = "img/" + str(sec) + "_4_thresh.jpg"
         cv2.imwrite(name, thresh)
 
     return (thresh)
@@ -108,8 +110,8 @@ def findLineCenter(thresh):
             cv2.line(crop_img,(cx,0),(cx,720),(255,0,0),1)
             cv2.line(crop_img,(0,cy),(1080,cy),(0,0,255),1)
             cv2.drawContours(crop_img, contours, -1, (0,255,0), 1)
-            name_img = "img/5_contour_" + str(cx) + ".jpg"
-            print("image:", name_img, "created", "cy:", cy)
+            name_img = "img/" + str(sec) + "_5_contour_" + str(cx) + ".jpg"
+            print("image:", name_img, "created", "cx:", cx)
             cv2.putText(crop_img, str(cx),(25,80), cv2.FONT_HERSHEY_SIMPLEX, 1, (10, 10, 10), 1, cv2.LINE_AA)
             cv2.imwrite(name_img, crop_img)
             sys.exit(0)
@@ -150,7 +152,7 @@ def findLine(spi):
 
             if (cx != 0):
                 error_counter = 0
-                delta = (cx - (WIDTH / 2)) / (WIDTH / 2) * (MAX_SPEED / 2) # == [ (cx - 320) / 16 ]  == [ (cx - 320) * 0.0625 ]
+                delta = (cx - (WIDTH / 2)) / (WIDTH / 2) * (MAX_SPEED / 2) # == [ (cx - (WIDTH / 2)) / 16 ]  == [ (cx - (WIDTH / 2)) * 0.0625 ]
                 cmpt_img = cmpt_img + 1
                 sendValueSPI(spi, delta);
             else:
@@ -162,7 +164,7 @@ def findLine(spi):
     except KeyboardInterrupt:
         spi.close()
         sys.exit(0)
-dbg = False
+# dbg = False
 
 # def wait_slave(spi):
 #     ret = [0,0,0,0]
@@ -182,8 +184,8 @@ def main():
     print_img = False
     if (len(sys.argv) > 1) and (sys.argv[1] == '-i'):
         print_img = True
-    elif (len(sys.argv) > 1) and (sys.argv[1] == '-d'):
-        dbg = True
+    # elif (len(sys.argv) > 1) and (sys.argv[1] == '-d'):
+    #     dbg = True
     spi = initSPI()
     # wait_slave(spi)
     findLine(spi)
