@@ -13,6 +13,7 @@ HEIGHT = 480
 
 MAX_SPEED = 40
 
+SPI_MAX_SPEED = 250000
 # UPPER_CROP = 379
 # LOWER_CROP = 480
 
@@ -29,7 +30,7 @@ def initSPI():
     print("spi init done")
     spi.open(0, 1)
     print("spi fd open")
-    spi.max_speed_hz = 250000 #? 
+    spi.max_speed_hz = SPI_MAX_SPEED #? 
     print("spi speed set")
     return(spi)
 
@@ -149,7 +150,7 @@ def findLine(spi):
 
             if (cx != 0):
                 error_counter = 0
-                delta = (cx - 320) / 320 * (MAX_SPEED / 2) # == [ (cx - 320) / 16 ]  == [ (cx - 320) * 0.0625 ]
+                delta = (cx - (WIDTH / 2)) / (WIDTH / 2) * (MAX_SPEED / 2) # == [ (cx - 320) / 16 ]  == [ (cx - 320) * 0.0625 ]
                 cmpt_img = cmpt_img + 1
                 sendValueSPI(spi, delta);
             else:
