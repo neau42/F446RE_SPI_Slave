@@ -98,14 +98,14 @@ int     get_send_three(char *line, int fd_spi)
 
 int  get_send_five(char *line, int fd_spi)
 {
-    int8_t value[5] = {0};
+    int8_t value[4] = {0};
     // unsigned char byte;
 
     while (1)
     {
-        printf("\tfive values: ");
+        printf("\tfour values: ");
         fgets(line, 80, stdin);
-        if (sscanf(line, "%hhd %hhd %hhd %hhd %hhd", &value[0], &value[1], &value[2], &value[3], &value[4]) != 5)// || value > 255 || value < 0)
+        if (sscanf(line, "%hhd %hhd %hhd %hhd", &value[0], &value[1], &value[2], &value[3]) != 4)// || value > 255 || value < 0)
         {
             fprintf(stderr, "integer value [0:255] expected\n\r");
             continue;
@@ -113,7 +113,7 @@ int  get_send_five(char *line, int fd_spi)
         // byte = (unsigned char)value;
         // printf("send: %d\n\r", byte);
         // if (write(fd_spi, &byte, 1) != 1)
-        if (write(fd_spi, &value, 5) != 5)
+        if (write(fd_spi, &value, 4) != 4)
         {
             perror("write");
             exit(EXIT_FAILURE);
@@ -148,7 +148,7 @@ int  get_send_one(char *line, int fd_spi)
 
 int ft_send(char *line, int fd_spi)
 {
-    u_int8_t cmd_w[5] = {40, 41, 42, 43, 44};
+    u_int8_t cmd_w[4] = {40, 41, 42, 43};
 
     if (write(fd_spi, &cmd_w, 5) != 5)
     {
@@ -165,7 +165,7 @@ int ft_send(char *line, int fd_spi)
 
 void ft_read(int fd_spi)
 {
-    u_int8_t cmd_r[5] = {44, 43, 42, 41, 40};
+    u_int8_t cmd_r[4] = {44, 43, 42, 41};
     
     if (write(fd_spi, &cmd_r, 5) != 5)
     {
@@ -185,7 +185,7 @@ void ft_read(int fd_spi)
             perror("read");
             exit(EXIT_FAILURE);
     }
-    fprintf(stdout, "receive: %hhd %hhd %hhd %hhd %hhd\n\r", byte[0], byte[1], byte[2], byte[3], byte[4]);
+    fprintf(stdout, "receive: %hhd %hhd %hhd %hhd\n\r", byte[0], byte[1], byte[2], byte[3]);
 }
 
 int spi_open(char *file_name)

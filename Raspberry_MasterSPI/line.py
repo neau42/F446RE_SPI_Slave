@@ -10,6 +10,7 @@ import spidev
 
 ## DEFINE
 DELAY = 0.01
+# DELAY = 0.5
 WIDTH = 640
 HEIGHT = 480
 
@@ -19,8 +20,8 @@ SPI_MAX_SPEED = 250000
 # UPPER_CROP = 379
 # LOWER_CROP = 480
 
-UPPER_CROP = 240
-LOWER_CROP = 480
+UPPER_CROP = 400
+LOWER_CROP = 640
 
 CMD_R_SLAVE = [40,41,42,43]
 CMD_W_SLAVE = [43,42,41,40]
@@ -47,13 +48,15 @@ def getResult(spi):
         spi.writebytes(CMD_W_SLAVE);
         time.sleep(DELAY)
     ret = spi.readbytes(4)
+    print("receive: ", ret);
     while (ret != [1,2,3,4]):
         time.sleep(DELAY)
         ret = spi.readbytes(4)
         print("read err: ", ret)
         
 def sendMotorsValues(spi, delta_left, delta_right):
-    # print("Send: LEFT:" , delta_left, "RIGHT:" , delta_right)
+    print("Send: LEFT:" , delta_left, "RIGHT:" , delta_right, "(" , [0, int(delta_left), int(delta_right), 0], ")")
+
     # ret = spi.xfer2([0, int(delta_left), int(delta_right), 0])
     spi.writebytes([0, int(delta_left), int(delta_right), 0])
     time.sleep(DELAY)
@@ -69,8 +72,13 @@ def captureFrame(video_capture):
 
 def convertFrame(frame):
     global crop_img
+    #rotate image:
+    rotate = cv2.rotate(frame, cv2.cv2.ROTATE_90_CLOCKWISE) 
+    if print_img:
+        name = "img/" + str(sec) + "_0_rotate.jpg"
+        cv2.imwrite(name, rotate)
     # Crop the image
-    crop_img = frame[UPPER_CROP:LOWER_CROP, 0:WIDTH]
+    crop_img = rotate[UPPER_CROP:LOWER_CROP, 0:WIDTH]
     if print_img:
         name = "img/" + str(sec) + "_1_crop.jpg"
         cv2.imwrite(name, crop_img)
