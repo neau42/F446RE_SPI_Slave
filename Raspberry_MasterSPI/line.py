@@ -11,14 +11,10 @@ import spidev
 DELAY = 0.01
 WIDTH = 640
 HEIGHT = 480
-
-MAX_SPEED = 70
-
+MOTOR_MAX_SPEED = 70
 SPI_MAX_SPEED = 250000
-
 UPPER_CROP = 539
 LOWER_CROP = WIDTH
-
 CMD_R_SLAVE = [40,41,42,43]
 CMD_W_SLAVE = [43,42,41,40]
 
@@ -42,7 +38,7 @@ def getResult(spi):
     # if R_W_CMD == 1:
     #     spi.writebytes(CMD_W_SLAVE);
     #     time.sleep(DELAY)
-    # ret = spi.readbytes(4)
+    ret = spi.readbytes(4)
     while (ret != [1,2,3,4]):
         time.sleep(DELAY)
         ret = spi.readbytes(4)
@@ -115,14 +111,18 @@ def findLineCenter(thresh):
     return (cx)
 
 def sendValueSPI(spi, delta):
-    sendMotorsValues(spi, (MAX_SPEED / 2) + int(delta/2), (MAX_SPEED / 2) - int(delta/2))
+    print("DELTA: ", delta)
+    sendMotorsValues(spi, (3 * MOTOR_MAX_SPEED / 4) + int(delta/2), (3 * MOTOR_MAX_SPEED / 4) - int(delta/2))
     time.sleep(DELAY)
 
 def rotateRobot(spi):
-    sendMotorsValues(spi,-(MAX_SPEED / 2), (MAX_SPEED / 2))
+    sendMotorsValues(spi,-(3 * MOTOR_MAX_SPEED / 4), (3 * MOTOR_MAX_SPEED / 4))
     time.sleep(DELAY)
 
 def loop(spi):
+    global sec
+    global old_sec
+
     video_capture = initVideoCapture()
     sec = int(time.time())
     old_sec = sec
@@ -136,8 +136,8 @@ def loop(spi):
             cx = findLineCenter(thresh)
             if (cx != 0):
                 error_counter = 0
-                delta = (cx - (WIDTH / 2)) / (WIDTH / 2) * (MAX_SPEED / 2)
-                cmpt_img = cmpt_img + 1
+                delta = (cx - (WIDTH / 2)) / (WIDTH / 2) * (MOTOR_MAX_SPEED / 4)
+                cmpt_img += 1
                 sendValueSPI(spi, delta);
             else:
                 error_counter += 1
@@ -156,8 +156,6 @@ def loop(spi):
 def main():
     global print_img
     global dbg
-    global sec
-    global old_sec
     dbg = False
     print_img = False
     if (len(sys.argv) > 1) and (sys.argv[1] == '-i'):
@@ -166,4 +164,5 @@ def main():
         dbg = True
     spi = initSPI()
     loop(spi)
+
 main()
