@@ -30,14 +30,14 @@ def initSPI():
 
 def initVideoCapture():
     video_capture = cv2.VideoCapture(0)
-    video_capture.set(3,HEIGHT)
+    video_capture.set(3, HEIGHT)
     video_capture.set(4, WIDTH)
     return (video_capture)
 
 def getResult(spi):
-    # if R_W_CMD == 1:
-    #     spi.writebytes(CMD_W_SLAVE);
-    #     time.sleep(DELAY)
+    if R_W_CMD == 1:
+        spi.writebytes(CMD_W_SLAVE);
+        time.sleep(DELAY)
     ret = spi.readbytes(4)
     while (ret != [1,2,3,4]):
         time.sleep(DELAY)
@@ -45,9 +45,9 @@ def getResult(spi):
         print("read err: ", ret)
         
 def sendMotorsValues(spi, delta_left, delta_right):
-    # if R_W_CMD == 1:
-        # spi.writebytes(CMD_R_SLAVE);
-        # time.sleep(DELAY)
+    if R_W_CMD == 1:
+        spi.writebytes(CMD_R_SLAVE);
+        time.sleep(DELAY)
     print("Send: LEFT:" , delta_left, "RIGHT:" , delta_right, "(" , [0, int(delta_left), int(delta_right), 0], ")")
     spi.writebytes([0, int(delta_left), int(delta_right), 0])
     time.sleep(DELAY)
@@ -60,6 +60,12 @@ def captureFrame(video_capture):
         cv2.imwrite(name, frame)
     return (frame)
 
+
+def test_threshold(blur):
+    for i in range(10,255, 5):
+        _, thresh = cv2.threshold(blur, i, 255, cv2.THRESH_BINARY_INV)
+        ret = cv2.imwrite("img/test_threshold_" + str(i) +".jpg", thresh)
+
 def convertFrame(frame):
     global crop_img
 
@@ -67,7 +73,11 @@ def convertFrame(frame):
     crop_img = rot[UPPER_CROP:LOWER_CROP, 0:WIDTH]
     gray = cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
-    _, thresh = cv2.threshold(blur, 100, 255, cv2.THRESH_BINARY_INV)
+
+    if print_img:
+        test_threshold(blur)
+
+    _, thresh = cv2.threshold(blur, 90, 255, cv2.THRESH_BINARY_INV)
     if print_img:
         name = "img/" + str(sec)
         cv2.imwrite(name + "_1_rotate.jpg", rot)
@@ -110,13 +120,13 @@ def findLineCenter(thresh):
     saveImg(contours, moments, cx)
     return (cx)
 
-def sendValueSPI(spi, delta):
+def computeMotorValue(spi, delta):
     print("DELTA: ", delta)
-    sendMotorsValues(spi, (MOTOR_MAX_SPEED) + int(delta / 2), (MOTOR_MAX_SPEED) - int(delta / 2))
+    sendMotorsValues(spi, (MOTOR_MAX_SPEED) / 2 + int(delta / 2), (MOTOR_MAX_SPEED) / 2 - int(delta / 2))
     time.sleep(DELAY)
 
 def rotateRobot(spi):
-    sendMotorsValues(spi,-(MOTOR_MAX_SPEED), (MOTOR_MAX_SPEED))
+    sendMotorsValues(spi,-(MOTOR_MAX_SPEED / 2), (MOTOR_MAX_SPEED / 2))
     time.sleep(DELAY)
 
 def loop(spi):
@@ -138,7 +148,7 @@ def loop(spi):
                 error_counter = 0
                 delta = (cx - (WIDTH / 2)) / (WIDTH / 2) * (MOTOR_MAX_SPEED / 2)
                 cmpt_img += 1
-                sendValueSPI(spi, delta);
+                computeMotorValue(spi, delta);
             else:
                 error_counter += 1
                 if (error_counter > 5):
