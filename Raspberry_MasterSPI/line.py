@@ -13,8 +13,8 @@ WIDTH = 640
 HEIGHT = 480
 MOTOR_MAX_SPEED = 70
 SPI_MAX_SPEED = 250000
-UPPER_CROP = 539
-LOWER_CROP = WIDTH
+UPPER_CROP = 379
+LOWER_CROP = HEIGHT
 CMD_R_SLAVE = [40,41,42,43]
 CMD_W_SLAVE = [43,42,41,40]
 
@@ -30,8 +30,8 @@ def initSPI():
 
 def initVideoCapture():
     video_capture = cv2.VideoCapture(0)
-    video_capture.set(3, WIDTH)
-    video_capture.set(4, HEIGHT)
+    video_capture.set(3,HEIGHT)
+    video_capture.set(4, WIDTH)
     return (video_capture)
 
 def getResult(spi):
@@ -64,7 +64,7 @@ def convertFrame(frame):
     global crop_img
 
     rot = cv2.rotate(frame, cv2.cv2.ROTATE_90_CLOCKWISE) 
-    crop_img = rot[UPPER_CROP:LOWER_CROP, 0:HEIGHT]
+    crop_img = rot[UPPER_CROP:LOWER_CROP, 0:WIDTH]
     gray = cv2.cvtColor(crop_img, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
     _, thresh = cv2.threshold(blur, 100, 255, cv2.THRESH_BINARY_INV)
@@ -112,11 +112,11 @@ def findLineCenter(thresh):
 
 def sendValueSPI(spi, delta):
     print("DELTA: ", delta)
-    sendMotorsValues(spi, (3 * MOTOR_MAX_SPEED / 4) + int(delta/2), (3 * MOTOR_MAX_SPEED / 4) - int(delta/2))
+    sendMotorsValues(spi, (MOTOR_MAX_SPEED) + int(delta / 2), (MOTOR_MAX_SPEED) - int(delta / 2))
     time.sleep(DELAY)
 
 def rotateRobot(spi):
-    sendMotorsValues(spi,-(3 * MOTOR_MAX_SPEED / 4), (3 * MOTOR_MAX_SPEED / 4))
+    sendMotorsValues(spi,-(MOTOR_MAX_SPEED), (MOTOR_MAX_SPEED))
     time.sleep(DELAY)
 
 def loop(spi):
@@ -136,7 +136,7 @@ def loop(spi):
             cx = findLineCenter(thresh)
             if (cx != 0):
                 error_counter = 0
-                delta = (cx - (WIDTH / 2)) / (WIDTH / 2) * (MOTOR_MAX_SPEED / 4)
+                delta = (cx - (WIDTH / 2)) / (WIDTH / 2) * (MOTOR_MAX_SPEED / 2)
                 cmpt_img += 1
                 sendValueSPI(spi, delta);
             else:
