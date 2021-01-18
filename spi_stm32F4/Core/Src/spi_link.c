@@ -30,27 +30,24 @@ void    spiLoop(void)
 
 void    spiRead(uint8_t *buffer_read)
 {
-//	printf("ft read receive: ");
 	HAL_SPI_Receive(&hspi2, buffer_read, 4, 250000);
 	if (buffer_read[0] == 0 && buffer_read[3] == 0)
 	{
-		printf("LEFT: %d ; RIGHT: %d\n\r", (int8_t)buffer_read[1], (int8_t)buffer_read[0]);
+//		printf("LEFT: %d ; RIGHT: %d\n\r", (int8_t)buffer_read[1], (int8_t)buffer_read[0]);
 		cmdLeftMotor((int8_t)buffer_read[1]);
 		cmdRightMotor((int8_t)buffer_read[2]);
 	}
-	//	else if (buffer_read[0] == 1 && buffer_read[0] == buffer_read[1] && buffer_read[0] == buffer_read[3])
 	else
 		printf("ERROR: [%d %d %d %d] from master\n\r", buffer_read[0], buffer_read[1], buffer_read[2], buffer_read[3]);
 }
+
 void    spiWrite(uint8_t *buffer_send)
 {
 	uint8_t parazite = 0;
 
-//	printf("ft write send data:\n");
 	HAL_SPI_Transmit(&hspi2, buffer_send, 4, 250000);
-//	printf("sending : %d %d %d %d\n\r",buffer_send[0],buffer_send[1],buffer_send[2],buffer_send[3]);
+	// need to read one bite after Transmit ??
 	HAL_SPI_Receive(&hspi2, &parazite, 1, 250000);
-//	printf("PARAZITE : [%d]\n\r", parazite);
 }
 
 void    cmdLeftMotor(int8_t value)
@@ -105,7 +102,6 @@ void    waitPressBlueButton(void)
 void    spiError(uint8_t *buffer_read, uint8_t *buffer_send)
 {
 	printf("ERROR: wait CMD_R || CMD_W [%d %d %d %d] from master\n\r", buffer_read[0], buffer_read[1], buffer_read[2], buffer_read[3]);
-
 	HAL_SPI_Receive(&hspi2, buffer_read, 1, 250000);
 	printf("DEBUG: Read(1): %d ", buffer_read[0]);
 	while(buffer_read[0] != 0)
