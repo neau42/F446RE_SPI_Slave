@@ -1,5 +1,6 @@
 Raspberry_MasterSPI/img/
 
+.vscode/
 
 spi_stm32F4/.mxproject
 spi_stm32F4/.osx.project

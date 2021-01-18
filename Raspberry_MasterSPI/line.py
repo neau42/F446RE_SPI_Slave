@@ -1,24 +1,46 @@
 #! /usr/bin/python3
+#* ************************************************************************** *#
+#*                                                                            *#
+#*                                                        :::      ::::::::   *#
+#*   line.c                                             :+:      :+:    :+:   *#
+#*                                                    +:+ +:+         +:+     *#
+#*   By: boulayen                                   +#+  +:+       +#+        *#
+#*        noe.boulaye@univ-grenoble-alpes.fr      +#+#+#+#+#+   +#+           *#
+#*   Created: 2020/11/15 10:42:11 by nboulaye          #+#    #+#             *#
+#*   Updated: 2021/01/18 15:48:07 by nboulaye         ###   ########.fr       *#
+#*                                                                            *#
+#*   Execution:                                                               *#
+#*   python3 line.py                                                          *#
+#*                                                                            *#
+#*   python3 line.py -i # Print image: execute once the loop and save images  *#
+#*                                                                            *#
+#*   python3 line.py -d # Debug: save one image by second in img directory    *#
+#*                              + test different thresholds values            *#
+#*                                                                            *#
+#* ************************************************************************** *#
 
 import numpy as np
 import cv2
 import sys
 import time
-
 import spidev
 
-
-DELAY = 0.01
 WIDTH = 640
 HEIGHT = 480
-MOTOR_MAX_SPEED = 70
-SPI_MAX_SPEED = 250000
+
 UPPER_CROP = 379
 LOWER_CROP = HEIGHT
+
+R_W_CMD = 0
 CMD_R_SLAVE = [40,41,42,43]
 CMD_W_SLAVE = [43,42,41,40]
 
-R_W_CMD = 0
+VALID_RETURN = [1,2,3,4]
+
+SPI_MAX_SPEED = 250000
+THRESHOLD = 90
+DELAY = 0.01
+MOTOR_MAX_SPEED = 70
 
 def initSPI():
     print("spi init... ", end="")
@@ -36,17 +58,17 @@ def initVideoCapture():
 
 def getResult(spi):
     if R_W_CMD == 1:
-        spi.writebytes(CMD_W_SLAVE);
+        spi.writebytes(CMD_W_SLAVE)
         time.sleep(DELAY)
     ret = spi.readbytes(4)
-    while (ret != [1,2,3,4]):
+    while (ret != VALID_RETURN):
         time.sleep(DELAY)
         ret = spi.readbytes(4)
         print("read err: ", ret)
         
 def sendMotorsValues(spi, delta_left, delta_right):
     if R_W_CMD == 1:
-        spi.writebytes(CMD_R_SLAVE);
+        spi.writebytes(CMD_R_SLAVE)
         time.sleep(DELAY)
     print("Send: LEFT:" , delta_left, "RIGHT:" , delta_right, "(" , [0, int(delta_left), int(delta_right), 0], ")")
     spi.writebytes([0, int(delta_left), int(delta_right), 0])
@@ -77,7 +99,7 @@ def convertFrame(frame):
     if print_img:
         test_threshold(blur)
 
-    _, thresh = cv2.threshold(blur, 90, 255, cv2.THRESH_BINARY_INV)
+    _, thresh = cv2.threshold(blur, THRESHOLD, 255, cv2.THRESH_BINARY_INV)
     if print_img:
         name = "img/" + str(sec)
         cv2.imwrite(name + "_1_rotate.jpg", rot)
@@ -87,22 +109,23 @@ def convertFrame(frame):
         cv2.imwrite(name + "_5_thresh.jpg", thresh)
     return (thresh)
 
+def saveContourImage(contours, moments, cx, name)
+        cy = int(moments['m01'] / moments['m00'])
+        cv2.line(crop_img, (cx, 0), (cx, 720), (255, 0, 0), 1)
+        cv2.line(crop_img, (0, cy), (1080, cy), (0, 0, 255), 1)
+        cv2.drawContours(crop_img, contours, -1, (0, 255, 0), 1)
+        cv2.putText(crop_img, str(cx), (25, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (10, 10, 10), 1, cv2.LINE_AA)
+        cv2.imwrite(name)
+
 def saveImg(contours, moments, cx):
     if print_img:
-        cy = int(moments['m01'] / moments['m00'])
-        cv2.line(crop_img, (cx, 0), (cx, 720), (255, 0, 0), 1)
-        cv2.line(crop_img, (0, cy), (1080, cy), (0, 0, 255), 1)
-        cv2.drawContours(crop_img, contours, -1, (0, 255, 0), 1)
-        cv2.putText(crop_img, str(cx), (25, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (10, 10, 10), 1, cv2.LINE_AA)
-        cv2.imwrite("img/" + str(sec) + "_6_contour_" + str(cx) + ".jpg", crop_img)
+        name = "img/" + str(sec) + "_6_contour_" + str(cx) + ".jpg", crop_img
+        saveContourImage(contours, moments, cx, name)
         sys.exit(0)
     elif sec != old_sec and dbg:
-        cy = int(moments['m01'] / moments['m00'])
-        cv2.line(crop_img, (cx, 0), (cx, 720), (255, 0, 0), 1)
-        cv2.line(crop_img, (0, cy), (1080, cy), (0, 0, 255), 1)
-        cv2.drawContours(crop_img, contours, -1, (0, 255, 0), 1)
-        cv2.putText(crop_img, str(cx), (25, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (10, 10, 10), 1, cv2.LINE_AA)
-        cv2.imwrite("img/" + str(sec) + "_Contour_" + str(cx) + ".jpg", crop_img)
+        name = "img/" + str(sec) + "_Contour_" + str(cx) + ".jpg", crop_img
+        saveContourImage(contours, moments, cx, name)
+
 
 def findLineCenter(thresh):
     # Find the contours of the frame
@@ -121,7 +144,6 @@ def findLineCenter(thresh):
     return (cx)
 
 def computeMotorValue(spi, delta):
-    print("DELTA: ", delta)
     sendMotorsValues(spi, (MOTOR_MAX_SPEED) / 2 + int(delta / 2), (MOTOR_MAX_SPEED) / 2 - int(delta / 2))
     time.sleep(DELAY)
 
@@ -148,7 +170,7 @@ def loop(spi):
                 error_counter = 0
                 delta = (cx - (WIDTH / 2)) / (WIDTH / 2) * (MOTOR_MAX_SPEED / 2)
                 cmpt_img += 1
-                computeMotorValue(spi, delta);
+                computeMotorValue(spi, delta)
             else:
                 error_counter += 1
                 if (error_counter > 5):
@@ -166,6 +188,7 @@ def loop(spi):
 def main():
     global print_img
     global dbg
+
     dbg = False
     print_img = False
     if (len(sys.argv) > 1) and (sys.argv[1] == '-i'):

@@ -24,8 +24,8 @@
 /* USER CODE BEGIN Includes */
 
 #include "Lib_PedagoBot_TP9.h"
+#include "spi_link.h"
 #include <stdio.h> // Pour l'utilisation de printf
-#include <string.h>
 
 /* USER CODE END Includes */
 
@@ -36,7 +36,6 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-# define R_W_CMD 0
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -49,14 +48,12 @@ SPI_HandleTypeDef hspi2;
 
 UART_HandleTypeDef huart2;
 
-
 /* USER CODE BEGIN PV */
-uint8_t ButtonPressed = 0;
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
-void SystemClock_Config(void);
+//void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_SPI2_Init(void);
 static void MX_USART2_UART_Init(void);
@@ -66,9 +63,6 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
-static uint8_t CMD_R[4] = {40, 41, 42, 43};
-static uint8_t CMD_W[4] = {43, 42, 41, 40};
 
 // Redéfinition de la fonction write pour rediriger le printf sur l'uart2
 int _write(int file, unsigned char *ptr, int len)
@@ -82,83 +76,6 @@ int _write(int file, unsigned char *ptr, int len)
 	return len;
 }
 
-void cmd_left_motor(int8_t value)
-{
-	printf("LEFT [%d] ",value);
-	setMotorSpeed(MOTORG, value);
-}
-
-void cmd_right_motor(int8_t value)
-{
-	printf("RIGHT [%d]\n\r",value);
-	setMotorSpeed(MOTORD, value);
-}
-
-void stop_motors(void)
-{
-	setMotorSpeed(MOTORG, 0);
-	setMotorSpeed(MOTORD, 0);
-
-}
-
-void ft_read(uint8_t *buffer_read)
-{
-	printf("ft read receive: ");
-	HAL_SPI_Receive(&hspi2, buffer_read, 4, 250000);
-	if (buffer_read[0] == 0 && buffer_read[3] == 0)
-	{
-		cmd_left_motor((int8_t)buffer_read[1]);
-		cmd_right_motor((int8_t)buffer_read[2]);
-	}
-	//	else if (buffer_read[0] == 1 && buffer_read[0] == buffer_read[1] && buffer_read[0] == buffer_read[3])
-	else
-		printf("ERROR: [%d %d %d %d] from master\n\r", buffer_read[0], buffer_read[1], buffer_read[2], buffer_read[3]);
-}
-void ft_write(uint8_t *buffer_send)
-{
-	uint8_t parazite = 0;
-
-	printf("ft write send data:\n");
-	HAL_SPI_Transmit(&hspi2, buffer_send, 4, 250000);
-	printf("sending : %d %d %d %d\n\r",buffer_send[0],buffer_send[1],buffer_send[2],buffer_send[3]);
-	HAL_SPI_Receive(&hspi2, &parazite, 1, 250000);
-	printf("PARAZITE : [%d]\n\r", parazite);
-}
-
-uint8_t blue_button_pressed(void)
-{
-	if (!HAL_GPIO_ReadPin(GPIOC, GPIO_PIN_13))
-	{
-		ButtonPressed = ~(ButtonPressed) & 0x01;
-		printf("pressed : %d\n\r", ButtonPressed);
-		HAL_Delay(100);
-		return(1);
-	}
-	return(0);
-}
-
-void 	wait_press_blue_button(void)
-{
-	while (!blue_button_pressed())
-		;
-}
-
-void ft_error(uint8_t *buffer_read, uint8_t *buffer_send)
-{
-	printf("ERROR: wait CMD_R || CMD_W [%d %d %d %d] from master\n\r", buffer_read[0], buffer_read[1], buffer_read[2], buffer_read[3]);
-
-	HAL_SPI_Receive(&hspi2, buffer_read, 1, 250000);
-	printf("DEBUG: Read(1): %d ", buffer_read[0]);
-	while(buffer_read[0] != 0)
-	{
-		HAL_SPI_Receive(&hspi2, buffer_read, 1, 250000);
-		printf(": %d ", buffer_read[0]);
-	}
-	ft_write(buffer_send);
-	printf("\n\r");
-}
-
-
 //
 //void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 //{
@@ -171,8 +88,6 @@ void ft_error(uint8_t *buffer_read, uint8_t *buffer_send)
 
 int main(void)
 {
-	uint8_t buffer_send[4] = {1, 2, 3, 4};
-	uint8_t buffer_read[4] = {0};
 
 //  HAL_Init();           // in init_PedagoBot_TP9
 //  SystemClock_Config(); // in init_PedagoBot_TP9
@@ -181,35 +96,7 @@ int main(void)
 	MX_SPI2_Init();
 	MX_USART2_UART_Init();
 	printf("\n\rinit PedagoBot ok\n\r");
-	printf("wait press blue button\r\n");
-	wait_press_blue_button();
-	while (1)
-	{
-		blue_button_pressed();
-		if (ButtonPressed == 1)
-		{
-			if (R_W_CMD)
-			{
-				HAL_SPI_Receive(&hspi2, buffer_read, 4, 250000);
-				if (memcmp(buffer_read, CMD_R, 4) == 0)
-					ft_read(buffer_read);
-				else if (memcmp(buffer_read, CMD_W, 4) == 0)
-					ft_write(buffer_send);
-				else
-					ft_error(buffer_read, buffer_send);
-			}
-			else
-			{
-				ft_read(buffer_read);
-				ft_write(buffer_send);
-			}
-		}
-		else
-		{
-			stop_motors();
-
-		}
-	}
+    spiLoop();
 }
 
 
