@@ -12,14 +12,13 @@
 #*   Execution:                                                               *#
 #*   python3 line.py                                                          *#
 #*                                                                            *#
-#*   python3 line.py -i # Print image: execute once the loop and save images  *#
+#*   python3 line.py -i # Print image: start the loop once and save the images*#
 #*                                                                            *#
-#*   python3 line.py -d # Debug: save one image by second in img directory    *#
+#*   python3 line.py -d # Debug: save one image by second                     *#
 #*                              + test different thresholds values            *#
 #*                                                                            *#
 #* ************************************************************************** *#
 
-import numpy as np
 import cv2
 import sys
 import time
@@ -38,16 +37,16 @@ CMD_W_SLAVE = [43,42,41,40]
 VALID_RETURN = [1,2,3,4]
 
 SPI_MAX_SPEED = 250000
-THRESHOLD = 90
+THRESHOLD = 80
 DELAY = 0.01
 MOTOR_MAX_SPEED = 70
 
 def initSPI():
     print("spi init... ", end="")
     spi = spidev.SpiDev()
-    print("Done")
     spi.open(0, 1)
     spi.max_speed_hz = SPI_MAX_SPEED
+    print("Done")
     return(spi)
 
 def initVideoCapture():
@@ -62,10 +61,21 @@ def getResult(spi):
         time.sleep(DELAY)
     ret = spi.readbytes(4)
     while (ret != VALID_RETURN):
+        print("read err [4]: ", ret)
         time.sleep(DELAY)
+        ## à tester!  ???????
+        while (ret != VALID_RETURN[3]):
+            print("read err [1]: ", ret)
+            ret = spi.readbytes(1)
+            time.sleep(DELAY)
         ret = spi.readbytes(4)
-        print("read err: ", ret)
-        
+        ## /à tester ???????
+
+    # while (ret != VALID_RETURN):
+    #     time.sleep(DELAY)
+    #     ret = spi.readbytes(4)
+    #     print("read err: ", ret)
+
 def sendMotorsValues(spi, delta_left, delta_right):
     if R_W_CMD == 1:
         spi.writebytes(CMD_R_SLAVE)
@@ -126,19 +136,14 @@ def saveImg(contours, moments, cx):
         name = "img/" + str(sec) + "_Contour_" + str(cx) + ".jpg", crop_img
         saveContourImage(contours, moments, cx, name)
 
-
 def findLineCenter(thresh):
-    # Find the contours of the frame
     _, contours, hierarchy = cv2.findContours(thresh, 1, cv2.CHAIN_APPROX_NONE)
-    # Find the biggest contour (if detected)
     if len(contours) == 0:
         return (0)
     c = max(contours, key = cv2.contourArea)
     moments = cv2.moments(c)
-    # Skip to avoid div by zero
     if int(moments['m00']) == 0:
         return (0)
-    # Get the line center
     cx = int(moments['m10'] / moments['m00'])
     saveImg(contours, moments, cx)
     return (cx)
@@ -148,7 +153,7 @@ def computeMotorValue(spi, delta):
     time.sleep(DELAY)
 
 def rotateRobot(spi):
-    sendMotorsValues(spi,-(MOTOR_MAX_SPEED / 2), (MOTOR_MAX_SPEED / 2))
+    sendMotorsValues(spi, -MOTOR_MAX_SPEED / 2, MOTOR_MAX_SPEED / 2)
     time.sleep(DELAY)
 
 def loop(spi):
@@ -180,7 +185,6 @@ def loop(spi):
                 print(cmpt_img , "img/s")
                 old_sec = sec
                 cmpt_img = 0
-
     except KeyboardInterrupt:
         spi.close()
         sys.exit(0)
