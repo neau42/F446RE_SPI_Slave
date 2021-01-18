@@ -7,7 +7,7 @@
 #*   By: boulayen                                   +#+  +:+       +#+        *#
 #*        noe.boulaye@univ-grenoble-alpes.fr      +#+#+#+#+#+   +#+           *#
 #*   Created: 2020/11/15 10:42:11 by nboulaye          #+#    #+#             *#
-#*   Updated: 2021/01/18 15:48:07 by nboulaye         ###   ########.fr       *#
+#*   Updated: 2021/01/18 17:12:07 by nboulaye         ###   ########.fr       *#
 #*                                                                            *#
 #*   Execution:                                                               *#
 #*   python3 line.py                                                          *#
