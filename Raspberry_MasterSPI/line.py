@@ -61,20 +61,13 @@ def getResult(spi):
         time.sleep(DELAY)
     ret = spi.readbytes(4)
     while (ret != VALID_RETURN):
-        print("read err [4]: ", ret)
+        print("read err [4]: ", ret , " != ", VALID_RETURN)
         time.sleep(DELAY)
-        ## à tester!  ???????
-        while (ret != VALID_RETURN[3]):
-            print("read err [1]: ", ret)
+        while (ret[0] != VALID_RETURN[3]):
+            print("read err [1] : ", ret[0], " != ", VALID_RETURN[3])
             ret = spi.readbytes(1)
             time.sleep(DELAY)
         ret = spi.readbytes(4)
-        ## /à tester ???????
-
-    # while (ret != VALID_RETURN):
-    #     time.sleep(DELAY)
-    #     ret = spi.readbytes(4)
-    #     print("read err: ", ret)
 
 def sendMotorsValues(spi, delta_left, delta_right):
     if R_W_CMD == 1:
@@ -119,7 +112,7 @@ def convertFrame(frame):
         cv2.imwrite(name + "_5_thresh.jpg", thresh)
     return (thresh)
 
-def saveContourImage(contours, moments, cx, name)
+def saveContourImage(contours, moments, cx, name):
         cy = int(moments['m01'] / moments['m00'])
         cv2.line(crop_img, (cx, 0), (cx, 720), (255, 0, 0), 1)
         cv2.line(crop_img, (0, cy), (1080, cy), (0, 0, 255), 1)
