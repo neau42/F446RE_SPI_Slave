@@ -54,8 +54,8 @@ all: main-build
 main-build: spi_stm32F4.elf secondary-outputs
 
 # Tool invocations
-spi_stm32F4.elf: $(OBJS) $(USER_OBJS) /Users/no/spi_test_1012/spi_stm32F4/STM32F446RETX_FLASH.ld
-	arm-none-eabi-gcc -o "spi_stm32F4.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/Users/no/spi_test_1012/spi_stm32F4/STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="spi_stm32F4.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+spi_stm32F4.elf: $(OBJS) $(USER_OBJS) /Users/no/F446RE_Slave/spi_stm32F4/STM32F446RETX_FLASH.ld
+	arm-none-eabi-gcc -o "spi_stm32F4.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"/Users/no/F446RE_Slave/spi_stm32F4/STM32F446RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="spi_stm32F4.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 
