@@ -16,10 +16,10 @@
 
 ####  stm:
 ###### compiler et televerser: 
-ouvrir et compiler le projet avec stm32CubeIDE puis
-    $> cp /spi_stm32F4/Release/spi_stm32F4.bin /Volumes/NODE_F446RE/.
+    ouvrir et compiler le projet avec stm32CubeIDE puis
+    $> cp spi_stm32F4/Release/spi_stm32F4.bin /Volumes/NODE_F446RE/.
 ###### lecture port serie:
-    ~ $> screen /dev/tty.usbmodem**** 115200
+    $> screen /dev/tty.usbmodem**** 115200
 
 ##### Raspberry:
 ###### execution:
