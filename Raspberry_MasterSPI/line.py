@@ -118,15 +118,15 @@ def saveContourImage(contours, moments, cx, name):
         cv2.line(crop_img, (0, cy), (1080, cy), (0, 0, 255), 1)
         cv2.drawContours(crop_img, contours, -1, (0, 255, 0), 1)
         cv2.putText(crop_img, str(cx), (25, 80), cv2.FONT_HERSHEY_SIMPLEX, 1, (10, 10, 10), 1, cv2.LINE_AA)
-        cv2.imwrite(name)
+        cv2.imwrite(name, crop_img)
 
 def saveImg(contours, moments, cx):
     if print_img:
-        name = "img/" + str(sec) + "_6_contour_" + str(cx) + ".jpg", crop_img
+        name = "img/" + str(sec) + "_6_contour_" + str(cx) + ".jpg"
         saveContourImage(contours, moments, cx, name)
         sys.exit(0)
     elif sec != old_sec and dbg:
-        name = "img/" + str(sec) + "_Contour_" + str(cx) + ".jpg", crop_img
+        name = "img/" + str(sec) + "_Contour_" + str(cx) + ".jpg"
         saveContourImage(contours, moments, cx, name)
 
 def findLineCenter(thresh):
