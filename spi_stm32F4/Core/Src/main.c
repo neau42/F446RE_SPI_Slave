@@ -76,31 +76,15 @@ int _write(int file, unsigned char *ptr, int len)
 	return len;
 }
 
-//
-//void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-//{
-//	printf("HAL_GPIO_EXTI_Callback\n\r");
-//	if (GPIO_Pin == B1_BlueButton_Pin)
-//		ButtonPressed = (!ButtonPressed) & 0x1;
-////	printf("END Callback\n\r");
-//}
-
-
 int main(void)
 {
-
-//  HAL_Init();           // in init_PedagoBot_TP9
-//  SystemClock_Config(); // in init_PedagoBot_TP9
 	init_PedagoBot_TP9();
 	MX_GPIO_Init();
 	MX_SPI2_Init();
 	MX_USART2_UART_Init();
 	printf("\n\rinit PedagoBot ok\n\r");
-    spiLoop();
+	spiLoop();
 }
-
-
-
 
 /* USER CODE END 0 */
 
@@ -113,40 +97,6 @@ int main(void)
   * @brief System Clock Configuration
   * @retval None
   */
-//void SystemClock_Config(void)
-//{
-//  RCC_OscInitTypeDef RCC_OscInitStruct = {0};
-//  RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
-//
-//  /** Configure the main internal regulator output voltage
-//  */
-//  __HAL_RCC_PWR_CLK_ENABLE();
-//  __HAL_PWR_VOLTAGESCALING_CONFIG(PWR_REGULATOR_VOLTAGE_SCALE3);
-//  /** Initializes the RCC Oscillators according to the specified parameters
-//  * in the RCC_OscInitTypeDef structure.
-//  */
-//  RCC_OscInitStruct.OscillatorType = RCC_OSCILLATORTYPE_HSI;
-//  RCC_OscInitStruct.HSIState = RCC_HSI_ON;
-//  RCC_OscInitStruct.HSICalibrationValue = RCC_HSICALIBRATION_DEFAULT;
-//  RCC_OscInitStruct.PLL.PLLState = RCC_PLL_NONE;
-//  if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-//  {
-//    Error_Handler();
-//  }
-//  /** Initializes the CPU, AHB and APB buses clocks
-//  */
-//  RCC_ClkInitStruct.ClockType = RCC_CLOCKTYPE_HCLK|RCC_CLOCKTYPE_SYSCLK
-//                              |RCC_CLOCKTYPE_PCLK1|RCC_CLOCKTYPE_PCLK2;
-//  RCC_ClkInitStruct.SYSCLKSource = RCC_SYSCLKSOURCE_HSI;
-//  RCC_ClkInitStruct.AHBCLKDivider = RCC_SYSCLK_DIV1;
-//  RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV1;
-//  RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
-//
-//  if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_0) != HAL_OK)
-//  {
-//    Error_Handler();
-//  }
-//}
 
 /**
   * @brief SPI2 Initialization Function

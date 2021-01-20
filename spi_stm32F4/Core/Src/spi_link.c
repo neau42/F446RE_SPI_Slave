@@ -47,7 +47,7 @@ void    spiWrite(uint8_t *buffer_send)
 
 	printf("spiWrite send: %d %d %d %d\n\r",buffer_send[0], buffer_send[1], buffer_send[2], buffer_send[3]);
 	HAL_SPI_Transmit(&hspi2, buffer_send, 4, 250000);
-	// need to read one bite after Transmit ??
+	// need to read one bite after Transmit
 	HAL_SPI_Receive(&hspi2, &parazite, 1, 250000);
 }
 
