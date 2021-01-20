@@ -1,4 +1,5 @@
 #! /usr/bin/python3
+
 #* ************************************************************************** *#
 #*                                                                            *#
 #*                                                        :::      ::::::::   *#
@@ -7,15 +8,15 @@
 #*   By: boulayen                                   +#+  +:+       +#+        *#
 #*        noe.boulaye@univ-grenoble-alpes.fr      +#+#+#+#+#+   +#+           *#
 #*   Created: 2020/11/15 10:42:11 by nboulaye          #+#    #+#             *#
-#*   Updated: 2021/01/18 17:18:42 by nboulaye         ###   ########.fr       *#
+#*   Updated: 2021/01/20 09:33:42 by nboulaye         ###   ########.fr       *#
 #*                                                                            *#
-#*   Execution:                                                               *#
-#*   python3 line.py                                                          *#
+#* Execution:                                                                 *#
+#* $>python3 line.py                                                          *#
 #*                                                                            *#
-#*   python3 line.py -i # Print image: start the loop once and save the images*#
+#* $>python3 line.py -i # Print image: start the loop once and save the images*#
+#*                                      + test different thresholds values    *#
 #*                                                                            *#
-#*   python3 line.py -d # Debug: save one image by second                     *#
-#*                              + test different thresholds values            *#
+#* $>python3 line.py -d # Debug: save one image by second                     *#
 #*                                                                            *#
 #* ************************************************************************** *#
 
