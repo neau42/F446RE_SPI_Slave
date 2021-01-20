@@ -9,7 +9,7 @@
 
 #### stm32
  <img src="readme/stm32F446re_pin_Left.png" width="400">
- <img src="readme/stm32F446re_pin_Right.png" width="400">
+ <img src="readme/stm32F446re_pin_right.png" width="400">
 
 #### raspberry 3
 <img src="readme/Raspberry_3_spi.png" width="400">
